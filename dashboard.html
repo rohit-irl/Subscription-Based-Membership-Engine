@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | SparkEngine</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="dashboard-body">
+    <div class="bg-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <i class="fas fa-bolt"></i> Spark<span>Engine</span>
+            </a>
+            <div class="nav-links">
+                <a href="#" class="btn btn-outline btn-sm" id="logoutBtn">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="dashboard container">
+        <div class="section-header" style="text-align: left;">
+            <h2>Welcome back, John!</h2>
+            <p>Here's what's happening with your subscription today.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="left-col">
+                <div class="dash-card glass card">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h3>Usage Metrics</h3>
+                        <span class="text-success"><i class="fas fa-sync-alt"></i> Live</span>
+                    </div>
+
+                    <div class="progress-container">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span>Project Slots (7/10)</span>
+                            <span>70%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 70%;"></div>
+                        </div>
+                    </div>
+
+                    <div class="progress-container">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span>API Calls (45k / 50k)</span>
+                            <span>90%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 90%; background: var(--secondary-color);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-card glass card">
+                    <h3>Recent Activity</h3>
+                    <ul style="list-style: none; margin-top: 20px;">
+                        <li
+                            style="padding: 12px 0; border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; gap: 15px;">
+                            <i class="fas fa-plus-circle text-success"></i>
+                            <div>
+                                <p style="font-weight: 500;">New Project Created</p>
+                                <small style="color: var(--text-muted);">2 hours ago</small>
+                            </div>
+                        </li>
+                        <li
+                            style="padding: 12px 0; border-bottom: 1px solid var(--glass-border); display: flex; align-items: center; gap: 15px;">
+                            <i class="fas fa-key text-primary"></i>
+                            <div>
+                                <p style="font-weight: 500;">API Key Regenerated</p>
+                                <small style="color: var(--text-muted);">Yesterday, 4:32 PM</small>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="right-col">
+                <div class="dash-card glass card" style="border: 2px solid var(--primary-color);">
+                    <div class="popular-badge" style="top: 15px; right: 15px;">Current Plan</div>
+                    <h3>Pro Plan</h3>
+                    <p class="price" style="margin: 16px 0;">
+                        <span class="amount" style="font-size: 2.5rem;">$49</span>
+                        <span class="duration">/mo</span>
+                    </p>
+                    <a href="pricing.html" class="btn btn-primary btn-full">Upgrade Plan</a>
+                </div>
+
+                <div class="dash-card glass card">
+                    <h3>Billing Info</h3>
+                    <div style="margin-top: 20px;">
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Next Billing Date</p>
+                        <p style="font-weight: 600; margin-bottom: 16px;">March 15, 2024</p>
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">Payment Method</p>
+                        <p style="font-weight: 600;"><i class="fab fa-cc-visa"></i> Visa ending in 4242</p>
+                    </div>
+                    <a href="#"
+                        style="display: block; margin-top: 24px; color: var(--primary-color); text-decoration: none;">Manage
+                        Invoices →</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/script.js"></script>
+    <script>
+        // Specific Dashboard Script
+        document.getElementById('logoutBtn').addEventListener('click', (e) => {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+
+</html>

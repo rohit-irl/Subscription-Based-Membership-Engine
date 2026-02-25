@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Membership Engine | SaaS Landing Page</title>
+    <title>SparkEngine | Premium Membership Solution</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,249 +14,75 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
-    <!-- Background Accents -->
     <div class="bg-blobs">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
         <div class="blob blob-3"></div>
     </div>
 
-    <!-- Navigation -->
     <nav class="navbar">
         <div class="container">
-            <a href="#" class="logo">
+            <a href="index.html" class="logo">
                 <i class="fas fa-bolt"></i> Spark<span>Engine</span>
             </a>
             <div class="nav-links">
-                <a href="#features">Features</a>
-                <a href="#pricing">Pricing</a>
-                <a href="#dashboard">Dashboard</a>
-                <button class="btn btn-outline" id="loginBtn">Log In</button>
-                <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+                <a href="features.html">Features</a>
+                <a href="pricing.html">Pricing</a>
+                <a href="login.html">Login</a>
+                <a href="signup.html" class="btn btn-primary btn-sm">Sign Up</a>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <header class="hero">
         <div class="container">
-            <div class="hero-content">
-                <h1 class="fade-in">Choose Your Perfect <span>Membership Plan</span></h1>
-                <p class="fade-in delay-1">Unlock powerful tools and premium features designed to scale your business.
-                    Join 10,000+ creators and professional teams today.</p>
-                <div class="hero-btns fade-in delay-2">
-                    <a href="#pricing" class="btn btn-primary btn-lg">Get Started</a>
-                    <a href="#dashboard" class="btn btn-secondary btn-lg">View Demo</a>
-                </div>
+            <h1>Scale Your Business with <span>Tiered Logic</span></h1>
+            <p>The ultimate membership engine designed for modern SaaS. Handle subscriptions, tiered access, and user
+                management with one powerful interface.</p>
+            <div class="hero-btns">
+                <a href="pricing.html" class="btn btn-primary">Choose Your Plan</a>
+                <a href="features.html" class="btn btn-outline">Explore Features</a>
             </div>
         </div>
     </header>
 
-    <!-- Pricing Section -->
-    <section id="pricing" class="pricing">
+    <section class="highlights">
         <div class="container">
             <div class="section-header">
-                <h2>Simple, Transparent Pricing</h2>
-                <div class="toggle-container">
-                    <span>Monthly</span>
-                    <label class="switch">
-                        <input type="checkbox" id="billingToggle">
-                        <span class="slider round"></span>
-                    </label>
-                    <span>Yearly <small class="badge">Save 20%</small></span>
-                </div>
+                <h2>Why Choose SparkEngine?</h2>
+                <p>Built for developers, loved by businesses. Our engine provides the flexibility you need.</p>
             </div>
-
-            <div class="pricing-grid">
-                <!-- Basic Plan -->
-                <div class="pricing-card glass">
-                    <div class="card-body">
-                        <h3>Basic Plan</h3>
-                        <div class="price">
-                            <span class="currency">$</span>
-                            <span class="amount" data-monthly="19" data-yearly="15">19</span>
-                            <span class="duration">/mo</span>
-                        </div>
-                        <p class="plan-desc">Perfect for individuals and small projects.</p>
-                        <ul class="features">
-                            <li><i class="fas fa-check-circle"></i> 5 Projects</li>
-                            <li><i class="fas fa-check-circle"></i> Basic Analytics</li>
-                            <li><i class="fas fa-check-circle"></i> 1GB Storage</li>
-                            <li><i class="fas fa-check-circle"></i> Community Support</li>
-                            <li class="disabled"><i class="fas fa-times-circle"></i> Custom Domains</li>
-                        </ul>
-                        <button class="btn btn-outline btn-full">Choose Basic</button>
-                    </div>
+            <div class="features-grid">
+                <div class="feature-item glass">
+                    <div class="feature-icon"><i class="fas fa-rocket"></i></div>
+                    <h3>Fast Integration</h3>
+                    <p>Get up and running in minutes with our plug-and-play architecture.</p>
                 </div>
-
-                <!-- Pro Plan -->
-                <div class="pricing-card glass popular">
-                    <div class="popular-badge">Most Popular</div>
-                    <div class="card-body">
-                        <h3>Pro Plan</h3>
-                        <div class="price">
-                            <span class="currency">$</span>
-                            <span class="amount" data-monthly="49" data-yearly="39">49</span>
-                            <span class="duration">/mo</span>
-                        </div>
-                        <p class="plan-desc">Advanced tools for growing businesses.</p>
-                        <ul class="features">
-                            <li><i class="fas fa-check-circle"></i> Unlimited Projects</li>
-                            <li><i class="fas fa-check-circle"></i> Advanced Analytics</li>
-                            <li><i class="fas fa-check-circle"></i> 10GB Storage</li>
-                            <li><i class="fas fa-check-circle"></i> Priority Support</li>
-                            <li><i class="fas fa-check-circle"></i> Custom Domains</li>
-                        </ul>
-                        <button class="btn btn-primary btn-full">Choose Pro</button>
-                    </div>
+                <div class="feature-item glass">
+                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h3>Secure Access</h3>
+                    <p>Enterprise-grade security for your users' sensitive data.</p>
                 </div>
-
-                <!-- Enterprise Plan -->
-                <div class="pricing-card glass">
-                    <div class="card-body">
-                        <h3>Enterprise</h3>
-                        <div class="price">
-                            <span class="currency">$</span>
-                            <span class="amount" data-monthly="99" data-yearly="79">99</span>
-                            <span class="duration">/mo</span>
-                        </div>
-                        <p class="plan-desc">Full suite of tools for large enterprise teams.</p>
-                        <ul class="features">
-                            <li><i class="fas fa-check-circle"></i> Unlimited Everything</li>
-                            <li><i class="fas fa-check-circle"></i> Real-time Analytics</li>
-                            <li><i class="fas fa-check-circle"></i> Unlimited Storage</li>
-                            <li><i class="fas fa-check-circle"></i> 24/7 Dedicated Support</li>
-                            <li><i class="fas fa-check-circle"></i> White-labeling</li>
-                        </ul>
-                        <button class="btn btn-outline btn-full">Contact Sales</button>
-                    </div>
+                <div class="feature-item glass">
+                    <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Real-time Insights</h3>
+                    <p>Track your growth with advanced analytics and usage tracking.</p>
                 </div>
             </div>
         </div>
     </section>
-
-    <!-- Feature Comparison Table -->
-    <section id="features" class="comparison">
-        <div class="container">
-            <h2 class="text-center">Compare Features</h2>
-            <div class="table-container glass">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Feature</th>
-                            <th>Basic</th>
-                            <th>Pro</th>
-                            <th>Enterprise</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Number of Projects</td>
-                            <td>5</td>
-                            <td>Unlimited</td>
-                            <td>Unlimited</td>
-                        </tr>
-                        <tr>
-                            <td>Analytics</td>
-                            <td>Basic</td>
-                            <td>Advanced</td>
-                            <td>Real-time</td>
-                        </tr>
-                        <tr>
-                            <td>API Access</td>
-                            <td><i class="fas fa-times text-danger"></i></td>
-                            <td><i class="fas fa-check text-success"></i></td>
-                            <td><i class="fas fa-check text-success"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Custom Branding</td>
-                            <td><i class="fas fa-times text-danger"></i></td>
-                            <td><i class="fas fa-times text-danger"></i></td>
-                            <td><i class="fas fa-check text-success"></i></td>
-                        </tr>
-                        <tr>
-                            <td>Cloud Storage</td>
-                            <td>1GB</td>
-                            <td>10GB</td>
-                            <td>Unlimited</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <!-- Dashboard Preview -->
-    <section id="dashboard" class="dashboard-preview">
-        <div class="container">
-            <h2 class="text-center">User Dashboard Preview</h2>
-            <div class="dashboard-card glass">
-                <div class="dashboard-header">
-                    <div class="user-info">
-                        <img src="https://ui-avatars.com/api/?name=John+Doe&background=6366f1&color=fff"
-                            alt="User Avatar" class="avatar">
-                        <div>
-                            <h4>Welcome back, John!</h4>
-                            <p>Current Plan: <span class="badge-pro">Pro Plan</span></p>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary btn-sm">Upgrade Plan</button>
-                </div>
-                <div class="dashboard-stats">
-                    <div class="stat-item">
-                        <label>Storage Usage</label>
-                        <div class="progress-bar">
-                            <div class="progress" style="width: 75%;"></div>
-                        </div>
-                        <p>7.5 GB of 10 GB used</p>
-                    </div>
-                    <div class="billing-card">
-                        <h5>Next Billing Date</h5>
-                        <p>March 15, 2024</p>
-                        <a href="#">Manage Billing</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Login/Signup Modal -->
-    <div id="authModal" class="modal">
-        <div class="modal-content glass">
-            <span class="close-modal">&times;</span>
-            <div class="modal-header">
-                <h2 id="modalTitle">Log In</h2>
-                <p id="modalSubtitle">Access your account to manage your subscription.</p>
-            </div>
-            <form id="authForm">
-                <div class="input-group">
-                    <input type="email" id="email" required placeholder=" ">
-                    <label for="email">Email Address</label>
-                </div>
-                <div class="input-group">
-                    <input type="password" id="password" required placeholder=" ">
-                    <label for="password">Password</label>
-                </div>
-                <button type="submit" class="btn btn-primary btn-full">Continue</button>
-            </form>
-            <div class="modal-footer">
-                <p>Don't have an account? <a href="#" id="toggleAuth">Sign up</a></p>
-            </div>
-        </div>
-    </div>
 
     <footer class="main-footer">
         <div class="container text-center">
-            <p>&copy; 2024 SparkEngine. All rights reserved.</p>
+            <p>&copy; 2024 SparkEngine. All rights reserved. <br> Modern SaaS UI for Next-Gen Platforms.</p>
         </div>
     </footer>
 
-    <!-- Custom Script -->
-    <script src="script.js"></script>
+    <script src="js/script.js"></script>
 </body>
 
 </html>
