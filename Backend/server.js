@@ -3,9 +3,16 @@ const cors = require('cors');
 const { pool, ensureDatabase } = require('./db');
 const { authRequired } = require('./middleware/auth');
 const jwt = require('jsonwebtoken');
+const Razorpay = require('razorpay');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID || 'rzp_test_mock_123',
+  key_secret: process.env.RAZORPAY_KEY_SECRET || 'rzp_test_secret_456',
+});
 
 const FRONTEND_ORIGINS = [
   'http://127.0.0.1:5500',
@@ -372,6 +379,119 @@ app.get('/api/profile', authRequired, async (req, res) => {
   } catch (error) {
     console.error('Error in GET /api/profile:', error);
     return res.status(500).json({ message: 'Internal server error.' });
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
+// -------------------------
+// Payment API (Manual UPI)
+// -------------------------
+
+app.post('/api/verify-payment', authRequired, async (req, res) => {
+  const { plan, amount, paymentMethod, action, transactionId } = req.body;
+  const userId = req.userId;
+
+  if (!plan || !amount || !transactionId || !action || paymentMethod !== 'UPI') {
+    return res.status(400).json({ message: 'Missing required payment verification details.' });
+  }
+
+  let connection;
+  try {
+    connection = await pool.getConnection();
+
+    // Check if the transaction ID was already submitted today (basic check to prevent duplicates)
+    const [existing] = await connection.query(
+      'SELECT id FROM payments WHERE transaction_id = ? LIMIT 1',
+      [transactionId]
+    );
+
+    if (existing.length > 0) {
+      return res.status(400).json({ message: 'Transaction ID already submitted.' });
+    }
+
+    // Insert as pending
+    await connection.query(
+      `
+        INSERT INTO payments (user_id, plan, amount, action, transaction_id, status)
+        VALUES (?, ?, ?, ?, ?, 'pending')
+      `,
+      [userId, plan, amount, action, transactionId]
+    );
+
+    return res.json({ message: 'Payment details submitted. Waiting for admin approval.' });
+  } catch (error) {
+    console.error('Error recording pending payment:', error);
+    return res.status(500).json({ message: 'Internal server error while logging payment.' });
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
+app.post('/api/admin/approve-payment', async (req, res) => {
+  // In a real app, protect this route with Admin middleware.
+  const { paymentId } = req.body;
+
+  if (!paymentId) {
+    return res.status(400).json({ message: 'paymentId is required.' });
+  }
+
+  let connection;
+  try {
+    connection = await pool.getConnection();
+
+    // Fetch the pending payment
+    const [rows] = await connection.query('SELECT * FROM payments WHERE id = ?', [paymentId]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Payment record not found.' });
+    }
+
+    const payment = rows[0];
+
+    if (payment.status !== 'pending') {
+      return res.status(400).json({ message: `Payment is already ${payment.status}.` });
+    }
+
+    const { user_id, action, plan } = payment;
+
+    // Approve logic
+    if (action === 'renew') {
+      const [uRows] = await connection.query('SELECT expiry_date FROM users WHERE id = ?', [user_id]);
+      if (uRows.length === 0) return res.status(404).json({ message: 'User not found.' });
+
+      await connection.query(
+        `UPDATE users SET expiry_date = DATE_ADD(COALESCE(expiry_date, NOW()), INTERVAL 30 DAY) WHERE id = ?`,
+        [user_id]
+      );
+    } else if (action === 'upgrade') {
+      if (!plan) return res.status(400).json({ message: 'Plan is required for upgrade.' });
+
+      const selectedPlan = await getPlanByName(connection, plan);
+      if (!selectedPlan) return res.status(400).json({ message: 'Invalid plan.' });
+
+      await connection.query(
+        `
+          UPDATE users
+          SET plan = ?,
+              plan_id = ?,
+              download_limit = ?,
+              expiry_date = DATE_ADD(COALESCE(expiry_date, NOW()), INTERVAL 30 DAY)
+          WHERE id = ?
+        `,
+        [selectedPlan.plan_name, selectedPlan.id, selectedPlan.download_limit ?? PREMIUM_DOWNLOAD_LIMIT, user_id]
+      );
+    } else {
+      return res.status(400).json({ message: 'Unknown action type.' });
+    }
+
+    // Mark payment as success
+    await connection.query('UPDATE payments SET status = ? WHERE id = ?', ['success', payment.id]);
+
+    return res.json({ message: `Payment ${payment.id} successfully approved and user updated.` });
+  } catch (error) {
+    console.error('Error approving payment:', error);
+    return res.status(500).json({ message: 'Failed to approve payment.' });
   } finally {
     if (connection) connection.release();
   }

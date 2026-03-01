@@ -9,9 +9,11 @@
   },
   "dependencies": {
     "cors": "*",
+    "crypto": "^1.0.1",
     "express": "*",
     "jsonwebtoken": "*",
-    "mysql2": "*"
+    "mysql2": "*",
+    "razorpay": "^2.9.6"
   },
   "devDependencies": {
     "nodemon": "*"

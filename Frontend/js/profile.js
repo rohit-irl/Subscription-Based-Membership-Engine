@@ -135,7 +135,7 @@ async function loadProfile() {
     setText('profileName', profile.name || 'User');
     setText('profileEmail', profile.email || 'Not available');
     setText('profileId', profile.id || `USR-${Math.floor(10000 + Math.random() * 90000)}`);
-    
+
     // Update Avatar Image with name
     const profileImage = document.getElementById('profileImage');
     if (profileImage && profile.name) {
@@ -171,7 +171,7 @@ async function loadProfile() {
         badge.textContent = 'Active';
         badge.className = 'badge badge-success';
       }
-      
+
       // Assume a 30-day billing cycle for progress representation, cap at 100%
       let progressPercent = (remainingDays / 30) * 100;
       if (progressPercent > 100) progressPercent = 100;
@@ -204,8 +204,188 @@ async function loadProfile() {
   }
 }
 
+// Edit Profile Logic
+function bindEditProfile() {
+  const editBtn = document.getElementById('editProfileBtn');
+  const modal = document.getElementById('editProfileModal');
+  const closeBtn = document.getElementById('closeEditModal');
+  const form = document.getElementById('editProfileForm');
+
+  if (!editBtn || !modal || !closeBtn || !form) return;
+  if (editBtn.dataset.bound) return;
+
+  editBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    const currentName = document.getElementById('profileName').textContent;
+    const currentEmail = document.getElementById('profileEmail').textContent;
+    document.getElementById('editName').value = currentName === '—' ? '' : currentName;
+    document.getElementById('editEmail').value = currentEmail === '—' ? '' : currentEmail;
+    modal.classList.add('show');
+  });
+
+  closeBtn.addEventListener('click', () => {
+    modal.classList.remove('show');
+  });
+
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) modal.classList.remove('show');
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.textContent = 'Saving...';
+    submitBtn.disabled = true;
+
+    const newName = document.getElementById('editName').value.trim();
+    const newEmail = document.getElementById('editEmail').value.trim();
+
+    try {
+      // Send PUT request to backend
+      const response = await fetch(`${API_BASE_URL}/api/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getFirstLocalStorageValue(TOKEN_KEYS)}`
+        },
+        body: JSON.stringify({ name: newName, email: newEmail })
+      });
+
+      if (!response.ok) {
+        // If 404 (backend not implemented), we simulate success as per prompt
+        if (response.status !== 404) {
+          throw new Error('Failed to update profile');
+        }
+      }
+
+      // Update UI dynamically
+      setText('profileName', newName);
+      setText('profileEmail', newEmail);
+
+      const profileImage = document.getElementById('profileImage');
+      if (profileImage && newName) {
+        profileImage.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(newName)}&background=10b981&color=fff&size=120`;
+      }
+
+      setStatus('success', 'Profile updated successfully.');
+      modal.classList.remove('show');
+    } catch (error) {
+      setStatus('error', error.message || 'Error updating profile');
+    } finally {
+      submitBtn.textContent = originalText;
+      submitBtn.disabled = false;
+    }
+  });
+
+  editBtn.dataset.bound = '1';
+}
+
+// Upgrade Plan Logic
+function bindUpgradePlan() {
+  const upgradeBtn = document.getElementById('upgradeBtn');
+  const modal = document.getElementById('upgradePlanModal');
+  const closeBtn = document.getElementById('closeUpgradeModal');
+  const form = document.getElementById('upgradePlanForm');
+
+  if (!upgradeBtn || !modal || !closeBtn || !form) return;
+  if (upgradeBtn.dataset.bound) return;
+
+  upgradeBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    modal.classList.add('show');
+  });
+
+  closeBtn.addEventListener('click', () => {
+    modal.classList.remove('show');
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const selectedPlan = document.getElementById('planSelect').value;
+
+    let amount = 1900;
+    if (selectedPlan === 'Pro') amount = 4900;
+    if (selectedPlan === 'Premium') amount = 9900;
+
+    // Redirect to custom Payment Page
+    window.location.href = `payment.html?action=upgrade&plan=${encodeURIComponent(selectedPlan)}&amount=${amount}`;
+  });
+
+  upgradeBtn.dataset.bound = '1';
+}
+
+// Renew Subscription Logic
+function bindRenewSubscription() {
+  const renewBtn = document.getElementById('renewBtn');
+  if (!renewBtn || renewBtn.dataset.bound) return;
+
+  renewBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    const amount = 999;
+    const currentPlan = document.getElementById('profilePlan').textContent || 'Free';
+
+    // Redirect to custom Payment Page
+    window.location.href = `payment.html?action=renew&plan=${encodeURIComponent(currentPlan)}&amount=${amount}`;
+  });
+
+  renewBtn.dataset.bound = '1';
+}
+
+// Profile Image Upload Logic
+function bindImageUpload() {
+  const fileInput = document.getElementById('profileImageInput');
+  const profileImage = document.getElementById('profileImage');
+  if (!fileInput || !profileImage || fileInput.dataset.bound) return;
+
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Preview image instantly
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      profileImage.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    setStatus('info', 'Uploading image...');
+
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      formData.append('userId', getFirstLocalStorageValue(USER_ID_KEYS) || '1');
+
+      // Upload to backend via FormData
+      const response = await fetch(`${API_BASE_URL}/api/upload`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${getFirstLocalStorageValue(TOKEN_KEYS)}`
+        },
+        body: formData
+      });
+
+      if (!response.ok && response.status !== 404) {
+        throw new Error('Image upload failed');
+      }
+
+      // Update UI after success
+      setStatus('success', 'Profile image updated successfully.');
+    } catch (error) {
+      setStatus('error', error.message || 'Error uploading image');
+    }
+  });
+
+  fileInput.dataset.bound = '1';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   bindLogout();
+  bindEditProfile();
+  bindUpgradePlan();
+  bindRenewSubscription();
+  bindImageUpload();
   loadProfile();
 });
 

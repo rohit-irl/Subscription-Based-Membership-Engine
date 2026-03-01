@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Payment - Membership Engine</title>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        .payment-container {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .payment-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-header h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .payment-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-group {
+            text-align: center;
+            flex: 1;
+        }
+
+        .detail-group span {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-group strong {
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .qr-section {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 1rem;
+            padding: 10px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .qr-code img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .upi-section {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .upi-id {
+            font-family: monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .timer-section {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .timer {
+            font-size: 2rem;
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            transition: color 0.3s;
+        }
+
+        .timer.warning {
+            color: #ef4444;
+            animation: pulse 1s infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                opacity: 1;
+            }
+
+            to {
+                opacity: 0.6;
+            }
+        }
+
+        .transaction-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .transaction-section label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .transaction-section input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .transaction-section input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .btn-block {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .expired-message {
+            display: none;
+            text-align: center;
+            color: #ef4444;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-actions button {
+            flex: 1;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="payment-container glass card">
+        <div class="payment-header">
+            <h2>Complete Payment</h2>
+            <p class="text-muted">Scan the QR code to proceed</p>
+        </div>
+
+        <div class="payment-details">
+            <div class="detail-group">
+                <span>Plan</span>
+                <strong id="displayPlan">--</strong>
+            </div>
+            <div class="detail-group"
+                style="border-left: 1px solid rgba(0,0,0,0.05); border-right: 1px solid rgba(0,0,0,0.05);">
+                <span>Amount (INR)</span>
+                <strong id="displayAmount">₹0</strong>
+            </div>
+            <div class="detail-group">
+                <span>User ID</span>
+                <strong id="displayUserId">--</strong>
+            </div>
+        </div>
+
+        <div class="qr-section">
+            <div class="qr-code">
+                <img src="img/qr.png" alt="Payment QR Code"
+                    onerror="this.src='https://via.placeholder.com/200?text=QR+Failed+To+Load'">
+            </div>
+            <p class="text-muted" style="font-size: 0.9rem;">Scan with any UPI app</p>
+        </div>
+
+        <div class="upi-section">
+            <div>
+                <span style="font-size: 0.8rem; color: var(--text-muted); display: block;">Or pay to UPI ID</span>
+                <span class="upi-id" id="upiIdText">rohit69@fam</span>
+            </div>
+            <button class="copy-btn" id="copyBtn"><i class="fas fa-copy"></i> Copy</button>
+        </div>
+
+        <div class="timer-section">
+            <span style="font-size: 0.85rem; color: var(--text-muted); display: block;">Session expires in</span>
+            <div class="timer" id="countdownTimer">02:00</div>
+        </div>
+
+        <div class="transaction-section">
+            <label for="transactionId">Enter UPI Transaction ID <span style="color:#ef4444">*</span></label>
+            <input type="text" id="transactionId" placeholder="e.g. 308728947192" required>
+        </div>
+
+        <div class="expired-message" id="expiredMessage">
+            Payment session expired. Redirecting...
+        </div>
+
+        <div id="paymentStatus" style="margin-bottom: 1rem;"></div>
+
+        <button class="btn btn-primary btn-block" id="iHavePaidBtn">I Have Paid</button>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content glass card" style="padding: 2rem;">
+            <i class="fas fa-question-circle"
+                style="font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+            <h3>Confirm Payment</h3>
+            <p class="text-muted">Have you successfully transferred the amount to the provided exact UPI ID and entered
+                your Transaction ID?</p>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" id="cancelConfirmBtn">No, wait</button>
+                <button class="btn btn-primary" id="yesConfirmBtn">Yes, I Paid</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/payment.js"></script>
+</body>
+
+</html>

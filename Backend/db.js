@@ -127,6 +127,21 @@ async function ensureDatabase() {
     `
   );
 
+  await connection.query(`
+    CREATE TABLE IF NOT EXISTS payments (
+      id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+      user_id INT UNSIGNED NOT NULL,
+      plan VARCHAR(50) NOT NULL,
+      amount INT NOT NULL,
+      action ENUM('renew', 'upgrade') NOT NULL,
+      transaction_id VARCHAR(100) NOT NULL,
+      status ENUM('pending', 'success', 'failed', 'timeout') DEFAULT 'pending',
+      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (id),
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci;
+  `);
+
   await connection.end();
 }
 
