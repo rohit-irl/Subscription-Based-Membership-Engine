@@ -136,10 +136,14 @@ async function loadProfile() {
     setText('profileEmail', profile.email || 'Not available');
     setText('profileId', profile.id || `USR-${Math.floor(10000 + Math.random() * 90000)}`);
 
-    // Update Avatar Image with name
+    // Update Avatar Image with name or custom image
     const profileImage = document.getElementById('profileImage');
-    if (profileImage && profile.name) {
-      profileImage.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&background=10b981&color=fff&size=120`;
+    if (profileImage) {
+      if (profile.profile_image) {
+        profileImage.src = `${API_BASE_URL}${profile.profile_image}`;
+      } else if (profile.name) {
+        profileImage.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name)}&background=10b981&color=fff&size=120`;
+      }
     }
 
     // Subscription & Plan Details
@@ -264,7 +268,7 @@ function bindEditProfile() {
       setText('profileEmail', newEmail);
 
       const profileImage = document.getElementById('profileImage');
-      if (profileImage && newName) {
+      if (profileImage && !profileImage.src.includes('/uploads/') && newName) {
         profileImage.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(newName)}&background=10b981&color=fff&size=120`;
       }
 
@@ -366,11 +370,16 @@ function bindImageUpload() {
         body: formData
       });
 
-      if (!response.ok && response.status !== 404) {
-        throw new Error('Image upload failed');
+      const responseData = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(responseData.message || 'Image upload failed');
       }
 
       // Update UI after success
+      if (responseData.profile_image) {
+        profileImage.src = `${API_BASE_URL}${responseData.profile_image}`;
+      }
       setStatus('success', 'Profile image updated successfully.');
     } catch (error) {
       setStatus('error', error.message || 'Error uploading image');

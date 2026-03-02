@@ -12,6 +12,7 @@
     "crypto": "^1.0.1",
     "express": "*",
     "jsonwebtoken": "*",
+    "multer": "^2.1.0",
     "mysql2": "*",
     "razorpay": "^2.9.6"
   },

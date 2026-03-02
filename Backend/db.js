@@ -99,6 +99,9 @@ async function ensureDatabase() {
   if (!(await columnExists(connection, 'users', 'expiry_date'))) {
     await connection.query(`ALTER TABLE users ADD COLUMN expiry_date DATETIME NULL`);
   }
+  if (!(await columnExists(connection, 'users', 'profile_image'))) {
+    await connection.query(`ALTER TABLE users ADD COLUMN profile_image VARCHAR(255) NULL`);
+  }
 
   await connection.query(
     `

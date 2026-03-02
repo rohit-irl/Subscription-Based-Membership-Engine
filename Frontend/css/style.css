@@ -372,6 +372,15 @@ section {
 }
 
 /* Auth Pages */
+.auth-body {
+    background: url('../img/login-bg.png') no-repeat center center fixed;
+    background-size: cover;
+}
+
+.auth-body .bg-blobs {
+    display: none;
+}
+
 .auth-page {
     display: flex;
     align-items: center;

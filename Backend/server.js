@@ -5,6 +5,9 @@ const { authRequired } = require('./middleware/auth');
 const jwt = require('jsonwebtoken');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -48,6 +51,24 @@ app.use(
 );
 
 app.use(express.json());
+
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadsDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, req.userId + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+const upload = multer({ storage: storage });
+
+app.use('/uploads', express.static(uploadsDir));
 
 function formatUserResponse(user, message) {
   if (!user) return null;
@@ -353,7 +374,8 @@ app.get('/api/profile', authRequired, async (req, res) => {
             p.plan_name,
             u.expiry_date,
             u.downloads_used,
-            p.download_limit
+            p.download_limit,
+            u.profile_image
         FROM users u
         JOIN plans p ON u.plan_id = p.id
         WHERE u.id = ?;
@@ -374,7 +396,8 @@ app.get('/api/profile', authRequired, async (req, res) => {
       plan_name: profile.plan_name,
       expiry_date: profile.expiry_date,
       downloads_used: profile.downloads_used,
-      download_limit: profile.download_limit
+      download_limit: profile.download_limit,
+      profile_image: profile.profile_image
     });
   } catch (error) {
     console.error('Error in GET /api/profile:', error);
@@ -492,6 +515,72 @@ app.post('/api/admin/approve-payment', async (req, res) => {
   } catch (error) {
     console.error('Error approving payment:', error);
     return res.status(500).json({ message: 'Failed to approve payment.' });
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
+app.put('/api/profile', authRequired, async (req, res) => {
+  const userId = req.userId;
+  const { name, email } = req.body;
+
+  let connection;
+  try {
+    connection = await pool.getConnection();
+
+    await connection.query(
+      'UPDATE users SET name = COALESCE(?, name), email = COALESCE(?, email) WHERE id = ?',
+      [name, email, userId]
+    );
+
+    const [rows] = await connection.query('SELECT name, email, profile_image FROM users WHERE id = ?', [userId]);
+
+    return res.json({
+      message: 'Profile updated successfully.',
+      user: rows[0]
+    });
+  } catch (error) {
+    console.error('Error in PUT /api/profile:', error);
+    return res.status(500).json({ message: 'Internal server error.' });
+  } finally {
+    if (connection) connection.release();
+  }
+});
+
+app.post('/api/upload', authRequired, upload.single('avatar'), async (req, res) => {
+  const userId = req.userId;
+
+  if (!req.file) {
+    return res.status(400).json({ message: 'No file uploaded.' });
+  }
+
+  const profileImageUrl = `/uploads/${req.file.filename}`;
+
+  let connection;
+  try {
+    connection = await pool.getConnection();
+
+    // Get old image to delete it
+    const [rows] = await connection.query('SELECT profile_image FROM users WHERE id = ?', [userId]);
+    if (rows.length > 0 && rows[0].profile_image) {
+      const oldImage = rows[0].profile_image;
+      if (oldImage.startsWith('/uploads/')) {
+        const oldImagePath = path.join(__dirname, oldImage);
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+    }
+
+    await connection.query('UPDATE users SET profile_image = ? WHERE id = ?', [profileImageUrl, userId]);
+
+    return res.json({
+      message: 'Profile image updated successfully.',
+      profile_image: profileImageUrl
+    });
+  } catch (error) {
+    console.error('Error in POST /api/upload:', error);
+    return res.status(500).json({ message: 'Internal server error.' });
   } finally {
     if (connection) connection.release();
   }
