@@ -16,11 +16,333 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Minimal, page-scoped styling (keeps your design language) */
+        /* Profile page: premium styling — background image kept */
         #profileStatus {
             font-size: 0.95rem;
             color: var(--text-muted);
             min-height: 1.2em;
+        }
+
+        body.dashboard-body {
+            background: url('img/profile_bg.png') no-repeat center center fixed !important;
+            background-size: 100vw 100vh !important;
+            position: relative;
+        }
+
+        /* Dark overlay above background image for readability */
+        body.dashboard-body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(rgba(10, 10, 25, 0.75), rgba(10, 10, 25, 0.85));
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body.dashboard-body .dashboard.container {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Main profile card — glassmorphism, centered, wider */
+        body.dashboard-body .profile-header.glass.card {
+            max-width: 720px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 32px;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+            border-radius: 20px;
+            padding: 40px 44px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 32px;
+            transition: all 0.3s ease;
+        }
+
+        body.dashboard-body .profile-header.glass.card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 24px 56px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Avatar — larger, glowing ring, hover scale */
+        body.dashboard-body .profile-avatar {
+            position: relative;
+            overflow: visible;
+            border-radius: 50%;
+            width: 140px;
+            height: 140px;
+            flex-shrink: 0;
+        }
+
+        body.dashboard-body .profile-avatar::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.5), rgba(59, 130, 246, 0.5));
+            z-index: -1;
+            opacity: 0.8;
+            filter: blur(8px);
+        }
+
+        body.dashboard-body .profile-avatar .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            transition: transform 0.3s ease;
+        }
+
+        body.dashboard-body .profile-avatar:hover .avatar-img {
+            transform: scale(1.05);
+        }
+
+        body.dashboard-body #profileName {
+            font-size: 28px !important;
+            font-weight: 700 !important;
+            margin-bottom: 6px !important;
+            color: #fff;
+        }
+
+        body.dashboard-body #profileEmail,
+        body.dashboard-body .profile-info p {
+            opacity: 0.85;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Edit Profile button — rounded-full, glass */
+        body.dashboard-body #editProfileBtn {
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 12px 24px;
+            transition: all 0.3s ease;
+        }
+
+        body.dashboard-body #editProfileBtn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Subscription & Download cards — glassmorphism */
+        body.dashboard-body .dash-card.glass.card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+            border-radius: 20px;
+            padding: 32px 36px;
+            transition: all 0.3s ease;
+        }
+
+        body.dashboard-body .dash-card.glass.card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 24px 56px rgba(0, 0, 0, 0.4);
+        }
+
+        body.dashboard-body .dashboard-grid {
+            gap: 28px;
+            max-width: 720px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        body.dashboard-body .dash-card h3 {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.2rem;
+            margin-bottom: 24px;
+        }
+
+        body.dashboard-body .dash-card .subscription-details p,
+        body.dashboard-body .dash-card p[style*="color: var(--text-muted)"] {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        body.dashboard-body .dash-card .progress-container + p {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        /* Plan name — gradient (Premium) */
+        body.dashboard-body #profilePlan {
+            font-size: 1.35rem !important;
+            font-weight: 700 !important;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Active badge — pill, soft green glow */
+        body.dashboard-body #subscriptionBadge.badge-success,
+        body.dashboard-body #subscriptionBadge.badge {
+            border-radius: 9999px;
+            padding: 8px 16px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.35);
+        }
+
+        body.dashboard-body #subscriptionBadge.badge-success {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+
+        /* Progress bar — 8px, rounded-full, gradient */
+        body.dashboard-body .progress-bar {
+            height: 8px;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        body.dashboard-body .progress-fill {
+            height: 100%;
+            border-radius: 9999px;
+            background: linear-gradient(90deg, #10b981, #06b6d4);
+            transition: width 1s ease;
+        }
+
+        body.dashboard-body #profileExpiry {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Calendar icon next to expiry */
+        body.dashboard-body .subscription-details .expiry-wrap {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        body.dashboard-body .subscription-details .expiry-wrap i {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        /* Downloads card — bigger numbers, circular progress ring */
+        body.dashboard-body .usage-ring {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 3px solid transparent;
+            border-top-color: rgba(16, 185, 129, 0.9);
+            border-right-color: rgba(6, 182, 212, 0.6);
+            border-bottom-color: rgba(6, 182, 212, 0.3);
+            border-left-color: rgba(16, 185, 129, 0.5);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #fff;
+            transition: transform 0.3s ease;
+        }
+
+        body.dashboard-body .downloads-used-wrap:hover .usage-ring {
+            transform: scale(1.05);
+        }
+
+        body.dashboard-body #profileDownloadsUsed,
+        body.dashboard-body #profileDownloadLimit {
+            font-size: 1.5rem !important;
+            font-weight: 700 !important;
+            color: #fff;
+        }
+
+        body.dashboard-body .popular-badge {
+            border-radius: 9999px;
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            top: 16px;
+            right: 16px;
+        }
+
+        /* Upgrade button — gradient, hover glow */
+        body.dashboard-body #upgradeBtn {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: #fff;
+            border: none;
+            border-radius: 16px;
+            padding: 14px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        body.dashboard-body #upgradeBtn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 28px rgba(59, 130, 246, 0.45);
+        }
+
+        /* Renew button — match premium style */
+        body.dashboard-body #renewBtn {
+            border-radius: 16px;
+            padding: 14px 24px;
+            transition: all 0.3s ease;
+        }
+
+        body.dashboard-body #renewBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Page load fade-in */
+        body.dashboard-body .profile-header.animate {
+            animation: profileFadeIn 0.6s ease forwards;
+        }
+
+        body.dashboard-body .dashboard-grid.animate {
+            animation: profileFadeIn 0.6s 0.1s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes profileFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Override hover so card hover doesn't conflict with animation */
+        body.dashboard-body .profile-header.animate:hover {
+            transform: translateY(-6px);
+        }
+
+        body.dashboard-body .dashboard-grid.animate .dash-card:hover {
+            transform: translateY(-4px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body.dashboard-body .profile-header.glass.card {
+                padding: 28px 20px;
+                gap: 24px;
+            }
+            body.dashboard-body .profile-avatar {
+                width: 110px;
+                height: 110px;
+            }
+            body.dashboard-body #profileName {
+                font-size: 22px !important;
+            }
+            body.dashboard-body .dash-card.glass.card {
+                padding: 24px 20px;
+            }
+            body.dashboard-body .dashboard-grid {
+                gap: 20px;
+            }
         }
     </style>
 </head>
@@ -102,9 +424,8 @@
                                     <div class="progress-fill" id="subscriptionProgress" style="width: 0%;"></div>
                                 </div>
                             </div>
-                            <p
-                                style="color: var(--text-muted); font-size: 0.85rem; margin-top: 10px; text-align: right;">
-                                Expires on: <span id="profileExpiry" style="font-weight: 600;">—</span></p>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 10px; text-align: right;">
+                                <span class="expiry-wrap"><i class="fas fa-calendar-alt"></i> Expires on: <span id="profileExpiry" style="font-weight: 600;">—</span></span></p>
                         </div>
 
                         <button id="renewBtn" class="btn btn-primary btn-full"><i class="fas fa-sync-alt"></i> Renew
@@ -118,10 +439,11 @@
                     <div class="popular-badge" style="top: 15px; right: 15px;">Usage</div>
                     <h3 style="margin-bottom: 25px;">Downloads</h3>
                     <div>
-                        <div style="margin-bottom: 20px;">
-                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px;">Downloads Used
-                            </p>
-                            <p style="font-size: 1.25rem; font-weight: 600;" id="profileDownloadsUsed">—</p>
+                        <div class="downloads-used-wrap" style="margin-bottom: 20px;">
+                            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 8px;">Downloads Used</p>
+                            <div class="usage-ring">
+                                <span id="profileDownloadsUsed">—</span>
+                            </div>
                         </div>
 
                         <div style="margin-bottom: 30px;">
