@@ -162,6 +162,11 @@
             margin-bottom: 24px;
         }
 
+        /* Ensure remaining days text is readable on dark background */
+        body.dashboard-body #profileRemainingDays {
+            color: #e5e7eb !important;
+        }
+
         body.dashboard-body .dash-card .subscription-details p,
         body.dashboard-body .dash-card p[style*="color: var(--text-muted)"] {
             color: rgba(255, 255, 255, 0.7) !important;
@@ -580,6 +585,111 @@
             color: #e5e7eb;
         }
 
+        /* Change password modal */
+        body.dashboard-body #changePasswordModal .modal-content {
+            max-width: 420px;
+            border-radius: 20px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75);
+        }
+
+        body.dashboard-body #changePasswordModal h3 {
+            color: #e5e7eb;
+            margin-bottom: 18px;
+        }
+
+        body.dashboard-body #changePasswordModal .form-group label {
+            color: rgba(209, 213, 219, 0.9);
+        }
+
+        body.dashboard-body #changePasswordModal .form-group input {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: rgba(51, 65, 85, 0.9);
+            color: #e5e7eb;
+        }
+
+        body.dashboard-body #changePasswordModal .form-group input:focus {
+            border-color: #22c55e;
+            background: rgba(15, 23, 42, 1);
+        }
+
+        body.dashboard-body #changePasswordError {
+            min-height: 18px;
+            font-size: 0.82rem;
+            margin-top: 4px;
+        }
+
+        body.dashboard-body #changePasswordSuccess {
+            min-height: 18px;
+            font-size: 0.82rem;
+            margin-top: 4px;
+        }
+
+        body.dashboard-body .btn-spinner {
+            width: 16px;
+            height: 16px;
+            border-radius: 9999px;
+            border: 2px solid rgba(226, 232, 240, 0.5);
+            border-top-color: #22c55e;
+            border-right-color: #22c55e;
+            margin-right: 8px;
+            display: inline-block;
+            vertical-align: middle;
+            animation: spin 0.7s linear infinite;
+        }
+
+        body.dashboard-body .btn-spinner.hidden {
+            display: none;
+        }
+
+        /* Ensure change-password buttons/text are visible on dark background */
+        body.dashboard-body #changePasswordModal .btn.btn-outline {
+            color: #e5e7eb;
+            border-color: rgba(148, 163, 184, 0.7);
+            background: transparent;
+        }
+
+        body.dashboard-body #changePasswordModal .btn.btn-outline:hover {
+            background: rgba(15, 23, 42, 0.9);
+            color: #e5e7eb;
+        }
+
+        body.dashboard-body #changePasswordModal .password-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        body.dashboard-body #changePasswordModal .password-input-wrapper input {
+            padding-right: 44px;
+        }
+
+        body.dashboard-body #changePasswordModal .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: transparent;
+            border: none;
+            color: rgba(148, 163, 184, 0.9);
+            cursor: pointer;
+            padding: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body.dashboard-body #changePasswordModal .password-toggle:hover {
+            color: #e5e7eb;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             body.dashboard-body .profile-header.glass.card {
@@ -802,7 +912,7 @@
                                 <span class="security-status security-on">Enabled</span>
                             </li>
                         </ul>
-                        <button type="button" class="btn btn-outline btn-sm security-btn">
+                        <button type="button" class="btn btn-outline btn-sm security-btn" id="manageSecurityBtn">
                             <i class="fas fa-shield-alt"></i>
                             Manage Security
                         </button>
@@ -844,6 +954,53 @@
                         </select>
                     </div>
                     <button type="submit" class="btn btn-primary btn-full">Confirm Upgrade</button>
+                </form>
+            </div>
+        </div>
+
+        <div id="changePasswordModal" class="modal">
+            <div class="modal-content glass card">
+                <span class="close-modal" id="closeChangePasswordModal">&times;</span>
+                <h3>Change Password</h3>
+                <form id="changePasswordForm" novalidate>
+                    <div class="form-group password-group">
+                        <label for="currentPassword">Current Password</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="currentPassword" autocomplete="current-password" required>
+                            <button type="button" class="password-toggle" data-target="currentPassword" aria-label="Toggle current password visibility">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group password-group">
+                        <label for="newPassword">New Password</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="newPassword" autocomplete="new-password" required>
+                            <button type="button" class="password-toggle" data-target="newPassword" aria-label="Toggle new password visibility">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group password-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="confirmPassword" autocomplete="new-password" required>
+                            <button type="button" class="password-toggle" data-target="confirmPassword" aria-label="Toggle confirm password visibility">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p id="changePasswordError" class="text-danger"></p>
+                    <p id="changePasswordSuccess" class="text-success"></p>
+                    <div style="display: flex; gap: 12px; margin-top: 10px;">
+                        <button type="submit" class="btn btn-primary btn-full" id="changePasswordSubmit">
+                            <span class="btn-spinner hidden" id="changePasswordSpinner"></span>
+                            <span class="btn-label">Update Password</span>
+                        </button>
+                        <button type="button" class="btn btn-outline btn-full" id="cancelChangePassword">
+                            Cancel
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

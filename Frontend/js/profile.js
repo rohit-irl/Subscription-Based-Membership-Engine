@@ -389,12 +389,154 @@ function bindImageUpload() {
   fileInput.dataset.bound = '1';
 }
 
+// Change Password / Manage Security
+function bindChangePassword() {
+  const manageBtn = document.getElementById('manageSecurityBtn');
+  const modal = document.getElementById('changePasswordModal');
+  const closeBtn = document.getElementById('closeChangePasswordModal');
+  const cancelBtn = document.getElementById('cancelChangePassword');
+  const form = document.getElementById('changePasswordForm');
+  const errorEl = document.getElementById('changePasswordError');
+  const successEl = document.getElementById('changePasswordSuccess');
+  const submitBtn = document.getElementById('changePasswordSubmit');
+  const spinner = document.getElementById('changePasswordSpinner');
+
+  if (!manageBtn || !modal || !closeBtn || !cancelBtn || !form || !errorEl || !successEl || !submitBtn || !spinner) return;
+  if (manageBtn.dataset.bound === '1') return;
+
+  function resetMessages() {
+    errorEl.textContent = '';
+    successEl.textContent = '';
+  }
+
+  function closeModal() {
+    modal.classList.remove('show');
+    resetMessages();
+    form.reset();
+    submitBtn.disabled = false;
+    spinner.classList.add('hidden');
+  }
+
+  manageBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    resetMessages();
+    modal.classList.add('show');
+  });
+
+  closeBtn.addEventListener('click', () => {
+    closeModal();
+  });
+
+  cancelBtn.addEventListener('click', () => {
+    closeModal();
+  });
+
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+
+  // Toggle password visibility (eye icon)
+  const toggles = modal.querySelectorAll('.password-toggle');
+  toggles.forEach((btn) => {
+    if (!btn || btn.dataset.bound === '1') return;
+    const targetId = btn.getAttribute('data-target');
+    const input = targetId ? document.getElementById(targetId) : null;
+    if (!input) return;
+
+    btn.addEventListener('click', () => {
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      const icon = btn.querySelector('i');
+      if (icon) {
+        icon.classList.toggle('fa-eye', !isHidden);
+        icon.classList.toggle('fa-eye-slash', isHidden);
+      }
+    });
+
+    btn.dataset.bound = '1';
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    resetMessages();
+
+    const currentPassword = document.getElementById('currentPassword').value.trim();
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      errorEl.textContent = 'All fields are required.';
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      errorEl.textContent = 'New password must be at least 8 characters.';
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      errorEl.textContent = 'New password and confirmation do not match.';
+      return;
+    }
+
+    const token = getFirstLocalStorageValue(TOKEN_KEYS);
+    if (!token) {
+      errorEl.textContent = 'You are not logged in. Please login again.';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    spinner.classList.remove('hidden');
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/change-password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ currentPassword, newPassword })
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        const message = data && data.message ? data.message : 'Failed to update password.';
+        throw new Error(message);
+      }
+
+      successEl.textContent = data.message || 'Password updated successfully.';
+      setStatus('success', successEl.textContent);
+
+      setTimeout(() => {
+        closeModal();
+      }, 1200);
+    } catch (err) {
+      console.error('Change password failed:', err);
+      let message = err && err.message ? err.message : 'Failed to update password.';
+      if (message === 'Failed to fetch') {
+        message = `Cannot reach backend at ${API_BASE_URL}. Please ensure the backend is running and CORS/methods allow PUT requests.`;
+      }
+      errorEl.textContent = message;
+      setStatus('error', message);
+    } finally {
+      submitBtn.disabled = false;
+      spinner.classList.add('hidden');
+    }
+  });
+
+  manageBtn.dataset.bound = '1';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   bindLogout();
   bindEditProfile();
   bindUpgradePlan();
   bindRenewSubscription();
   bindImageUpload();
+  bindChangePassword();
   loadProfile();
 });
 
