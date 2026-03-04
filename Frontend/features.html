@@ -15,6 +15,260 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* =========================
+           Features Page (Homepage theme-aligned)
+           - Uses existing global theme (style.css)
+           - Adds premium layout polish without mismatching styles
+        ========================== */
+        .features-page {
+            position: relative;
+            padding: 100px 0 90px;
+        }
+
+        .features-page .section-header h2 {
+            font-size: 3rem;
+        }
+
+        .features-page .section-header p {
+            max-width: 720px;
+        }
+
+        /* Glow behind grid */
+        .feature-glow {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(700px 280px at 50% 20%, rgba(59, 130, 246, 0.16), transparent 60%),
+                radial-gradient(700px 280px at 40% 40%, rgba(16, 185, 129, 0.12), transparent 60%);
+            filter: blur(8px);
+            opacity: 0.9;
+        }
+
+        .features-grid {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Glass feature cards (aligned to global glass + purple/blue accents) */
+        .feature-item.glass {
+            position: relative;
+            border-radius: 18px;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
+            transition: transform 250ms ease, box-shadow 250ms ease, border-color 250ms ease;
+        }
+
+        .feature-item.glass:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 54px rgba(0, 0, 0, 0.14);
+            border-color: rgba(59, 130, 246, 0.22);
+        }
+
+        .feature-icon {
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.14);
+            box-shadow: 0 10px 24px rgba(59, 130, 246, 0.10);
+            transition: transform 250ms ease, box-shadow 250ms ease, filter 250ms ease;
+        }
+
+        .feature-item:hover .feature-icon {
+            transform: rotate(-4deg) scale(1.05);
+            box-shadow: 0 16px 38px rgba(59, 130, 246, 0.18);
+            filter: saturate(1.1);
+        }
+
+        /* Learn more: accordion toggle (no glow/light effect) */
+        .learn-more-btn {
+            margin-top: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            color: var(--secondary-color);
+            font-weight: 700;
+            text-decoration: none;
+            transition: opacity 200ms ease;
+        }
+
+        .learn-more-btn:hover {
+            opacity: 0.85;
+        }
+
+        .learn-more-btn i {
+            transition: transform 220ms ease;
+        }
+
+        .feature-item.is-open .learn-more-btn i {
+            transform: rotate(90deg);
+        }
+
+        .feature-more {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
+            color: var(--text-muted);
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(-6px);
+            transition: max-height 350ms cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 250ms ease,
+                transform 350ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .feature-item.is-open .feature-more {
+            max-height: 220px;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* How it works timeline */
+        .how-it-works {
+            padding: 90px 0;
+            position: relative;
+        }
+
+        .how-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-top: 26px;
+        }
+
+        .how-step {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 18px;
+            padding: 22px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
+            transition: transform 250ms ease, box-shadow 250ms ease;
+        }
+
+        .how-step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 18px 54px rgba(0, 0, 0, 0.45);
+        }
+
+        .how-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.14);
+            margin-bottom: 14px;
+            color: var(--secondary-color);
+            box-shadow: 0 14px 32px rgba(59, 130, 246, 0.12);
+        }
+
+        .how-step h4 {
+            margin-bottom: 6px;
+            font-size: 1.15rem;
+        }
+
+        /* Social proof */
+        .social-proof {
+            padding: 90px 0 110px;
+        }
+
+        .logo-strip {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 14px;
+            align-items: center;
+            margin: 22px 0 30px;
+            opacity: 0.85;
+        }
+
+        .logo-pill {
+            border-radius: 9999px;
+            padding: 10px 14px;
+            text-align: center;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.55);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        .testimonials {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .testimonial {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 18px;
+            padding: 22px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
+            transition: transform 250ms ease, box-shadow 250ms ease;
+        }
+
+        .testimonial:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 18px 54px rgba(0, 0, 0, 0.45);
+        }
+
+        .testimonial p {
+            margin-bottom: 14px;
+        }
+
+        .testimonial .who {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+        }
+
+        .who span {
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        /* Reveal animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 700ms cubic-bezier(0.4, 0, 0.2, 1), transform 700ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .reveal.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .logo-strip {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .testimonials {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .how-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -40,40 +294,137 @@
     <section class="features-page">
         <div class="container">
             <div class="section-header">
-                <h2>Powerful Tiered Logic</h2>
-                <p>Explore the tools and features that make CapySphere the choice of top-tier SaaS platforms.</p>
+                <h2 class="reveal">Everything you need to ship memberships</h2>
+                <p class="reveal">Explore the tools and features that make CapySphere feel like a top-tier SaaS engine.</p>
             </div>
 
+            <div class="feature-glow" aria-hidden="true"></div>
             <div class="features-grid">
-                <div class="feature-item glass">
+                <div class="feature-item glass reveal" style="transition-delay: 0ms;">
                     <div class="feature-icon"><i class="fas fa-layer-group"></i></div>
                     <h3>Tiered Permissions</h3>
                     <p>Easily define access levels for different membership tiers using our flexible logic system.</p>
+                    <button class="learn-more-btn" type="button" aria-expanded="false">
+                        Learn More <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                    <div class="feature-more" aria-hidden="true">
+                        Define roles, routes, and content gates per tier—then keep it consistent everywhere with a single policy layer.
+                    </div>
                 </div>
-                <div class="feature-item glass">
+                <div class="feature-item glass reveal" style="transition-delay: 90ms;">
                     <div class="feature-icon"><i class="fas fa-sync"></i></div>
                     <h3>Auto-Scaling</h3>
                     <p>Our engine automatically handles user growth without any manual database adjustments.</p>
+                    <button class="learn-more-btn" type="button" aria-expanded="false">
+                        Learn More <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                    <div class="feature-more" aria-hidden="true">
+                        Built on predictable rules and usage counters—so upgrades, renewals, and limits stay stable as you scale.
+                    </div>
                 </div>
-                <div class="feature-item glass">
+                <div class="feature-item glass reveal" style="transition-delay: 180ms;">
                     <div class="feature-icon"><i class="fas fa-key"></i></div>
                     <h3>API Gateways</h3>
                     <p>Expose specific endpoints based on user plans with built-in rate limiting.</p>
+                    <button class="learn-more-btn" type="button" aria-expanded="false">
+                        Learn More <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                    <div class="feature-more" aria-hidden="true">
+                        Gate APIs by plan and enforce fair-use limits with clear server-side checks and human-friendly responses.
+                    </div>
                 </div>
-                <div class="feature-item glass">
+                <div class="feature-item glass reveal" style="transition-delay: 0ms;">
                     <div class="feature-icon"><i class="fas fa-file-invoice-dollar"></i></div>
                     <h3>Native Billing</h3>
                     <p>Deep integration with payment gateways for seamless monthly and yearly renewals.</p>
+                    <button class="learn-more-btn" type="button" aria-expanded="false">
+                        Learn More <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                    <div class="feature-more" aria-hidden="true">
+                        Keep billing flows clean: upgrade/renew triggers payment first, and the backend updates subscriptions only after verification.
+                    </div>
                 </div>
-                <div class="feature-item glass">
+                <div class="feature-item glass reveal" style="transition-delay: 90ms;">
                     <div class="feature-icon"><i class="fas fa-user-shield"></i></div>
                     <h3>Identity Management</h3>
                     <p>Robust authentication and role-based access control (RBAC) out of the box.</p>
+                    <button class="learn-more-btn" type="button" aria-expanded="false">
+                        Learn More <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                    <div class="feature-more" aria-hidden="true">
+                        JWT/session support plus secure account actions (like change password) with protected routes and proper hashing.
+                    </div>
                 </div>
-                <div class="feature-item glass">
+                <div class="feature-item glass reveal" style="transition-delay: 180ms;">
                     <div class="feature-icon"><i class="fas fa-plug"></i></div>
                     <h3>Custom Plugins</h3>
                     <p>Extend the engine with your own logic using our comprehensive SDK and hooks.</p>
+                    <button class="learn-more-btn" type="button" aria-expanded="false">
+                        Learn More <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                    </button>
+                    <div class="feature-more" aria-hidden="true">
+                        Add custom business rules without rewriting the core—keep your membership logic modular and maintainable.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="reveal">How Tiered Logic Works</h2>
+                <p class="reveal">A clean, predictable flow that’s easy to implement and impossible to outgrow.</p>
+            </div>
+
+            <div class="how-grid">
+                <div class="how-step reveal" style="transition-delay: 0ms;">
+                    <div class="how-icon"><i class="fas fa-user-check"></i></div>
+                    <h4>Identify the user</h4>
+                    <p>Authenticate via JWT/session and resolve their plan instantly.</p>
+                </div>
+                <div class="how-step reveal" style="transition-delay: 90ms;">
+                    <div class="how-icon"><i class="fas fa-sliders-h"></i></div>
+                    <h4>Apply plan rules</h4>
+                    <p>Gate features, downloads, and limits using your tier configuration.</p>
+                </div>
+                <div class="how-step reveal" style="transition-delay: 180ms;">
+                    <div class="how-icon"><i class="fas fa-chart-line"></i></div>
+                    <h4>Measure & scale</h4>
+                    <p>Track usage and grow without rewrites—your rules keep up automatically.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="social-proof">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="reveal">Trusted by teams shipping fast</h2>
+                <p class="reveal">A simple engine that makes your membership product feel premium from day one.</p>
+            </div>
+
+            <div class="logo-strip reveal" style="transition-delay: 0ms;">
+                <div class="logo-pill">NOVALAB</div>
+                <div class="logo-pill">LINEARLY</div>
+                <div class="logo-pill">STRIPESYNC</div>
+                <div class="logo-pill">VERCELLA</div>
+                <div class="logo-pill">CLOUDNINE</div>
+                <div class="logo-pill">FOCUSLY</div>
+            </div>
+
+            <div class="testimonials">
+                <div class="testimonial reveal" style="transition-delay: 0ms;">
+                    <p>“We shipped tiered access in a weekend. The UX feels like a mature product.”</p>
+                    <div class="who"><i class="fas fa-user-circle"></i> Aanya <span>• Product Lead</span></div>
+                </div>
+                <div class="testimonial reveal" style="transition-delay: 90ms;">
+                    <p>“Permissions, limits, upgrades—everything stayed clean as our customer base grew.”</p>
+                    <div class="who"><i class="fas fa-user-circle"></i> Rohit <span>• Founder</span></div>
+                </div>
+                <div class="testimonial reveal" style="transition-delay: 180ms;">
+                    <p>“It looks premium and performs fast. Exactly the vibe we wanted.”</p>
+                    <div class="who"><i class="fas fa-user-circle"></i> Meera <span>• Engineer</span></div>
                 </div>
             </div>
         </div>
@@ -86,6 +437,47 @@
     </footer>
 
     <script src="js/script.js"></script>
+    <script>
+        // Scroll reveal (lightweight, Framer-ish)
+        (function () {
+            const revealEls = Array.from(document.querySelectorAll('.reveal'));
+            if (!('IntersectionObserver' in window)) {
+                revealEls.forEach(el => el.classList.add('is-visible'));
+                return;
+            }
+
+            const io = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            io.unobserve(entry.target);
+                        }
+                    });
+                },
+                { threshold: 0.12 }
+            );
+
+            revealEls.forEach(el => io.observe(el));
+        })();
+
+        // Learn More accordion (in-page expand/collapse)
+        (function () {
+            const cards = Array.from(document.querySelectorAll('.feature-item'));
+            cards.forEach((card) => {
+                const btn = card.querySelector('.learn-more-btn');
+                const panel = card.querySelector('.feature-more');
+                if (!btn || !panel) return;
+
+                btn.addEventListener('click', () => {
+                    const willOpen = !card.classList.contains('is-open');
+                    card.classList.toggle('is-open', willOpen);
+                    btn.setAttribute('aria-expanded', String(willOpen));
+                    panel.setAttribute('aria-hidden', String(!willOpen));
+                });
+            });
+        })();
+    </script>
 </body>
 
 </html>
