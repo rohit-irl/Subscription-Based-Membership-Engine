@@ -174,95 +174,6 @@
             font-size: 1.15rem;
         }
 
-        /* Social proof */
-        .social-proof {
-            padding: 90px 0 110px;
-        }
-
-        .logo-strip {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 14px;
-            align-items: center;
-            margin: 22px 0 30px;
-            opacity: 0.85;
-        }
-
-        .logo-pill {
-            border-radius: 9999px;
-            padding: 10px 14px;
-            text-align: center;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            background: rgba(255, 255, 255, 0.55);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-        }
-
-        .testimonials {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-        }
-
-        .testimonial {
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            border-radius: 18px;
-            padding: 22px;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.08);
-            transition: transform 250ms ease, box-shadow 250ms ease;
-        }
-
-        .testimonial:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 18px 54px rgba(0, 0, 0, 0.45);
-        }
-
-        .testimonial p {
-            margin-bottom: 14px;
-        }
-
-        .testimonial .who {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 700;
-        }
-
-        .who span {
-            font-weight: 500;
-            color: var(--text-muted);
-        }
-
-        /* Reveal animations */
-        .reveal {
-            opacity: 0;
-            transform: translateY(16px);
-            transition: opacity 700ms cubic-bezier(0.4, 0, 0.2, 1), transform 700ms cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .reveal.is-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Responsive */
-        @media (max-width: 992px) {
-            .logo-strip {
-                grid-template-columns: repeat(3, 1fr);
-            }
-
-            .testimonials {
-                grid-template-columns: 1fr;
-            }
-        }
-
         @media (max-width: 768px) {
             .how-grid {
                 grid-template-columns: 1fr;
@@ -295,7 +206,8 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="reveal">Everything you need to ship memberships</h2>
-                <p class="reveal">Explore the tools and features that make CapySphere feel like a top-tier SaaS engine.</p>
+                <p class="reveal">Explore the tools and features that make CapySphere feel like a top-tier SaaS engine.
+                </p>
             </div>
 
             <div class="feature-glow" aria-hidden="true"></div>
@@ -308,7 +220,8 @@
                         Learn More <i class="fas fa-chevron-right" aria-hidden="true"></i>
                     </button>
                     <div class="feature-more" aria-hidden="true">
-                        Define roles, routes, and content gates per tier—then keep it consistent everywhere with a single policy layer.
+                        Define roles, routes, and content gates per tier—then keep it consistent everywhere with a
+                        single policy layer.
                     </div>
                 </div>
                 <div class="feature-item glass reveal" style="transition-delay: 90ms;">
@@ -319,7 +232,8 @@
                         Learn More <i class="fas fa-chevron-right" aria-hidden="true"></i>
                     </button>
                     <div class="feature-more" aria-hidden="true">
-                        Built on predictable rules and usage counters—so upgrades, renewals, and limits stay stable as you scale.
+                        Built on predictable rules and usage counters—so upgrades, renewals, and limits stay stable as
+                        you scale.
                     </div>
                 </div>
                 <div class="feature-item glass reveal" style="transition-delay: 180ms;">
@@ -330,7 +244,8 @@
                         Learn More <i class="fas fa-chevron-right" aria-hidden="true"></i>
                     </button>
                     <div class="feature-more" aria-hidden="true">
-                        Gate APIs by plan and enforce fair-use limits with clear server-side checks and human-friendly responses.
+                        Gate APIs by plan and enforce fair-use limits with clear server-side checks and human-friendly
+                        responses.
                     </div>
                 </div>
                 <div class="feature-item glass reveal" style="transition-delay: 0ms;">
@@ -341,7 +256,8 @@
                         Learn More <i class="fas fa-chevron-right" aria-hidden="true"></i>
                     </button>
                     <div class="feature-more" aria-hidden="true">
-                        Keep billing flows clean: upgrade/renew triggers payment first, and the backend updates subscriptions only after verification.
+                        Keep billing flows clean: upgrade/renew triggers payment first, and the backend updates
+                        subscriptions only after verification.
                     </div>
                 </div>
                 <div class="feature-item glass reveal" style="transition-delay: 90ms;">
@@ -352,7 +268,8 @@
                         Learn More <i class="fas fa-chevron-right" aria-hidden="true"></i>
                     </button>
                     <div class="feature-more" aria-hidden="true">
-                        JWT/session support plus secure account actions (like change password) with protected routes and proper hashing.
+                        JWT/session support plus secure account actions (like change password) with protected routes and
+                        proper hashing.
                     </div>
                 </div>
                 <div class="feature-item glass reveal" style="transition-delay: 180ms;">
@@ -363,7 +280,8 @@
                         Learn More <i class="fas fa-chevron-right" aria-hidden="true"></i>
                     </button>
                     <div class="feature-more" aria-hidden="true">
-                        Add custom business rules without rewriting the core—keep your membership logic modular and maintainable.
+                        Add custom business rules without rewriting the core—keep your membership logic modular and
+                        maintainable.
                     </div>
                 </div>
             </div>
@@ -397,45 +315,10 @@
         </div>
     </section>
 
-    <section class="social-proof">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="reveal">Trusted by teams shipping fast</h2>
-                <p class="reveal">A simple engine that makes your membership product feel premium from day one.</p>
-            </div>
+    <!-- Trusted by teams section moved to index.html -->
+    
 
-            <div class="logo-strip reveal" style="transition-delay: 0ms;">
-                <div class="logo-pill">NOVALAB</div>
-                <div class="logo-pill">LINEARLY</div>
-                <div class="logo-pill">STRIPESYNC</div>
-                <div class="logo-pill">VERCELLA</div>
-                <div class="logo-pill">CLOUDNINE</div>
-                <div class="logo-pill">FOCUSLY</div>
-            </div>
-
-            <div class="testimonials">
-                <div class="testimonial reveal" style="transition-delay: 0ms;">
-                    <p>“We shipped tiered access in a weekend. The UX feels like a mature product.”</p>
-                    <div class="who"><i class="fas fa-user-circle"></i> Aanya <span>• Product Lead</span></div>
-                </div>
-                <div class="testimonial reveal" style="transition-delay: 90ms;">
-                    <p>“Permissions, limits, upgrades—everything stayed clean as our customer base grew.”</p>
-                    <div class="who"><i class="fas fa-user-circle"></i> Rohit <span>• Founder</span></div>
-                </div>
-                <div class="testimonial reveal" style="transition-delay: 180ms;">
-                    <p>“It looks premium and performs fast. Exactly the vibe we wanted.”</p>
-                    <div class="who"><i class="fas fa-user-circle"></i> Meera <span>• Engineer</span></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="main-footer">
-        <div class="container text-center">
-            <p>&copy; 2024 CapySphere. All rights reserved.</p>
-        </div>
-    </footer>
-
+    <div id="global-footer"></div>
     <script src="js/script.js"></script>
     <script>
         // Scroll reveal (lightweight, Framer-ish)

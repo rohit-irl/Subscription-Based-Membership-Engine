@@ -579,4 +579,38 @@ document.addEventListener('DOMContentLoaded', () => {
     bindLogout();
     loadDashboardUser();
 
+    // 8. Scroll reveal (lightweight, Framer-ish)
+    const revealEls = Array.from(document.querySelectorAll('.reveal'));
+    if (!('IntersectionObserver' in window)) {
+        revealEls.forEach(el => el.classList.add('is-visible'));
+    } else {
+        const revealIo = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        revealIo.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.12 }
+        );
+        revealEls.forEach(el => revealIo.observe(el));
+    }
+
+    // 9. Load Global Footer
+    const footerContainer = document.getElementById('global-footer');
+    if (footerContainer) {
+        fetch('footer.html')
+            .then(res => {
+                if (!res.ok) throw new Error('Footer not found');
+                return res.text();
+            })
+            .then(html => {
+                // Replace the placeholder div with the actual footer HTML
+                footerContainer.outerHTML = html;
+            })
+            .catch(err => console.error('Error loading footer:', err));
+    }
+
 });
