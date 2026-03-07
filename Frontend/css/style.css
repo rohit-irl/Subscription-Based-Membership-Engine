@@ -823,15 +823,85 @@ input:checked+.slider:before {
 
 @media (max-width: 768px) {
     .nav-links {
-        display: none;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 15px;
+        width: 100%;
+    }
+
+    .navbar .container {
+        flex-direction: column;
+        align-items: center;
+        padding: 0 10px;
+    }
+
+    body {
+        padding-top: 140px;
+        /* Adjust for taller navbar on mobile */
     }
 
     .hero h1 {
         font-size: 2.5rem;
     }
 
+    .hero {
+        padding: 40px 10px 30px;
+    }
+
+    .hero-btns {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: center;
+    }
+
+    .hero-btns .btn {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    section {
+        padding: 50px 0;
+    }
+
     .pricing-card.popular {
         transform: none;
+    }
+
+    .pricing-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero h1 {
+        font-size: 2rem;
+    }
+
+    .auth-card {
+        padding: 30px 20px;
+    }
+
+    .pricing-card {
+        padding: 30px 20px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .section-header h2 {
+        font-size: 2rem;
+    }
+
+    .amount {
+        font-size: 3.5rem;
     }
 }
 
@@ -916,9 +986,16 @@ input:checked+.slider:before {
 @media (max-width: 992px) {
     .logo-strip {
         grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
     }
 
     .testimonials {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .logo-strip {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
