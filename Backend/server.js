@@ -424,28 +424,54 @@ app.post('/api/verify-payment', authRequired, async (req, res) => {
   try {
     connection = await pool.getConnection();
 
-    // Check if the transaction ID was already submitted today (basic check to prevent duplicates)
+    // Enforce Unique Transaction ID Validation
     const [existing] = await connection.query(
       'SELECT id FROM payments WHERE transaction_id = ? LIMIT 1',
       [transactionId]
     );
 
     if (existing.length > 0) {
-      return res.status(400).json({ message: 'Transaction ID already submitted.' });
+      return res.status(400).json({ message: 'This Transaction ID has already been used. Please enter a valid unique ID.' });
     }
 
-    // Insert as pending
+    // Auto-approve logic: Insert the payment as 'success' and immediately activate the purchased feature
     await connection.query(
       `
         INSERT INTO payments (user_id, plan, amount, action, transaction_id, status)
-        VALUES (?, ?, ?, ?, ?, 'pending')
+        VALUES (?, ?, ?, ?, ?, 'success')
       `,
       [userId, plan, amount, action, transactionId]
     );
 
-    return res.json({ message: 'Payment details submitted. Waiting for admin approval.' });
+    // Activate the Purchased Feature automatically
+    if (action === 'renew') {
+      await connection.query(
+        `UPDATE users SET expiry_date = DATE_ADD(COALESCE(expiry_date, NOW()), INTERVAL 30 DAY) WHERE id = ?`,
+        [userId]
+      );
+    } else if (action === 'upgrade') {
+      const selectedPlan = await getPlanByName(connection, plan);
+      if (!selectedPlan) {
+        return res.status(400).json({ message: 'Invalid plan.' });
+      }
+
+      await connection.query(
+        `
+          UPDATE users
+          SET plan = ?,
+              plan_id = ?,
+              download_limit = ?,
+              expiry_date = DATE_ADD(COALESCE(expiry_date, NOW()), INTERVAL 30 DAY)
+          WHERE id = ?
+        `,
+        [selectedPlan.plan_name, selectedPlan.id, selectedPlan.download_limit ?? PREMIUM_DOWNLOAD_LIMIT, userId]
+      );
+    }
+
+    // Send successful response to frontend
+    return res.json({ message: 'Payment Successful ✅' });
   } catch (error) {
-    console.error('Error recording pending payment:', error);
+    console.error('Error recording payment:', error);
     return res.status(500).json({ message: 'Internal server error while logging payment.' });
   } finally {
     if (connection) connection.release();

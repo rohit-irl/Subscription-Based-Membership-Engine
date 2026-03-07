@@ -287,9 +287,18 @@
 
         <div class="qr-section">
             <div class="qr-code">
-                <img src="img/qr.png" alt="Payment QR Code"
-                    onerror="this.src='https://via.placeholder.com/200?text=QR+Failed+To+Load'">
+                <img id="qrCodeImg" src="img/qr.png" alt="Payment QR Code" width="220"
+                    onerror="this.onerror=null; this.src='https://via.placeholder.com/200?text=QR+Failed+To+Load'; this.alt='QR Code not available. Please use the UPI ID below.';">
             </div>
+            <script>
+                // Dynamic cache-busting to ensure the latest QR is always loaded
+                document.addEventListener('DOMContentLoaded', function () {
+                    var img = document.getElementById('qrCodeImg');
+                    if (img && img.src.indexOf('via.placeholder') === -1) {
+                        img.src = 'img/qr.png?v=' + new Date().getTime();
+                    }
+                });
+            </script>
             <p class="text-muted" style="font-size: 0.9rem;">Scan with any UPI app</p>
         </div>
 

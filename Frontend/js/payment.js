@@ -120,10 +120,19 @@ document.addEventListener('DOMContentLoaded', () => {
     paidBtn.addEventListener('click', () => {
         if (timeLeft <= 0) return;
 
+        statusDiv.innerHTML = ''; // clear previous alerts
+
         // Validate Transaction ID is not empty before showing modal
         const tid = txInput.value.trim();
         if (!tid) {
-            alert("Please enter your UPI Transaction ID before confirming.");
+            setStatus('error', "Please enter your UPI Transaction ID before confirming.");
+            txInput.focus();
+            return;
+        }
+
+        // Validate Transaction ID format
+        if (tid.length < 8 || !/^[a-zA-Z0-9]+$/.test(tid)) {
+            setStatus('error', "Invalid Transaction ID format. It should be alphanumeric and at least 8 characters long.");
             txInput.focus();
             return;
         }
@@ -168,8 +177,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Success logic
             modal.classList.remove('show');
-            setStatus('success', data.message || 'Payment logged successfully!');
+            setStatus('success', data.message || 'Payment Successful ✅');
             paidBtn.style.display = 'none';
+            txInput.disabled = true;
 
             // Redirect after a brief moment to see success msg
             setTimeout(() => {
