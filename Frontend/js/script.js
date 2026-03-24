@@ -547,14 +547,16 @@ document.addEventListener('DOMContentLoaded', () => {
         input.style.boxShadow = '';
     }
 
-    // 5. Active Link Highlight
-    const currentPath = getCurrentPageName();
-    document.querySelectorAll('.nav-links a').forEach(link => {
-        const href = link.getAttribute('href');
-        if (href === currentPath) {
-            link.classList.add('active');
-        }
-    });
+    // 5. Active Link Highlight (Moved into a function to call after header load)
+    function highlightActiveLink() {
+        const currentPath = getCurrentPageName();
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            const href = link.getAttribute('href');
+            if (href === currentPath) {
+                link.classList.add('active');
+            }
+        });
+    }
 
     // 6. Intersection Observer for Scroll Animations
     const observerOptions = {
@@ -575,9 +577,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 7. Dashboard session + actions
-    updateNavbarAuthLinks();
-    bindLogout();
-    loadDashboardUser();
+    // This is now delayed until the header loads if global-header is present
+    function initSessionActions() {
+        updateNavbarAuthLinks();
+        bindLogout();
+        loadDashboardUser();
+    }
 
     // 8. Scroll reveal (lightweight, Framer-ish)
     const revealEls = Array.from(document.querySelectorAll('.reveal'));
@@ -611,6 +616,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 footerContainer.outerHTML = html;
             })
             .catch(err => console.error('Error loading footer:', err));
+    }
+
+    // 10. Load Global Header
+    const headerContainer = document.getElementById('global-header');
+    if (headerContainer) {
+        fetch('header.html')
+            .then(res => {
+                if (!res.ok) throw new Error('Header not found');
+                return res.text();
+            })
+            .then(html => {
+                headerContainer.outerHTML = html;
+                highlightActiveLink();
+                initSessionActions();
+            })
+            .catch(err => {
+                console.error('Error loading header:', err);
+                initSessionActions(); // Fallback in case of failure
+            });
+    } else {
+        // If no global header placeholder is found, run actions anyway
+        highlightActiveLink();
+        initSessionActions();
     }
 
 });

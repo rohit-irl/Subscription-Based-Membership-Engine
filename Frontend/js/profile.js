@@ -538,5 +538,60 @@ document.addEventListener('DOMContentLoaded', () => {
   bindImageUpload();
   bindChangePassword();
   loadProfile();
+
+  // Load Global Header
+  const headerContainer = document.getElementById('global-header');
+  if (headerContainer) {
+    fetch('header.html')
+      .then(res => res.text())
+      .then(html => {
+        headerContainer.outerHTML = html;
+        // Profile page specific navbar updates (Hide Login/Signup, Show Profile/Logout)
+        const navLinks = document.querySelector('.nav-links');
+        if (navLinks) {
+          navLinks.querySelectorAll('[data-auth-link="1"]').forEach(el => el.remove());
+          const loginLink = navLinks.querySelector('a[href="login.html"]');
+          const signupLink = navLinks.querySelector('a[href="signup.html"]');
+          if (loginLink) loginLink.style.display = 'none';
+          if (signupLink) signupLink.style.display = 'none';
+          
+          const profileLink = document.createElement('a');
+          profileLink.href = 'profile.html';
+          profileLink.textContent = 'Profile';
+          profileLink.className = 'btn btn-outline btn-sm active';
+          profileLink.setAttribute('data-auth-link', '1');
+          
+          const logoutLink = document.createElement('a');
+          logoutLink.href = '#';
+          logoutLink.textContent = 'Logout';
+          logoutLink.className = 'btn btn-outline btn-sm';
+          logoutLink.id = 'logoutBtnDynamicProfile';
+          logoutLink.setAttribute('data-auth-link', '1');
+          
+          navLinks.appendChild(profileLink);
+          navLinks.appendChild(logoutLink);
+          
+          logoutLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (!confirm('Are you sure you want to logout?')) return;
+            try { await apiRequest('/api/logout', { method: 'POST' }); } catch (err) {}
+            clearAuthStorage();
+            window.location.href = 'login.html';
+          });
+        }
+      })
+      .catch(err => console.error('Error loading header:', err));
+  }
+
+  // Load Global Footer
+  const footerContainer = document.getElementById('global-footer');
+  if (footerContainer) {
+    fetch('footer.html')
+      .then(res => res.text())
+      .then(html => {
+        footerContainer.outerHTML = html;
+      })
+      .catch(err => console.error('Error loading footer:', err));
+  }
 });
 
