@@ -13,6 +13,8 @@
         rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -85,9 +87,11 @@
             </div>
 
             <div class="right-col">
-                <div class="dash-card glass card" style="border: 2px solid var(--primary-color);">
-                    <div class="popular-badge" style="top: 15px; right: 15px;">Current Plan</div>
-                    <h3>Pro Plan</h3>
+                <div class="dash-card glass card" style="border: 2px solid var(--primary-color); position: relative;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h3 style="margin-bottom: 0;">Pro Plan</h3>
+                        <div class="popular-badge" style="position: static; margin-bottom: 10px; padding: 6px 12px; background: var(--primary-color); border-radius: 9999px; transform: none; box-shadow: none;">Current Plan</div>
+                    </div>
                     <p class="price" style="margin: 16px 0;">
                         <span class="amount" style="font-size: 2.5rem;">$49</span>
                         <span class="duration">/mo</span>
@@ -103,7 +107,7 @@
                         <p style="color: var(--text-muted); font-size: 0.9rem;">Payment Method</p>
                         <p style="font-weight: 600;"><i class="fab fa-cc-visa"></i> Visa ending in 4242</p>
                     </div>
-                    <a href="#"
+                    <a href="#" id="manageInvoicesBtn"
                         style="display: block; margin-top: 24px; color: var(--primary-color); text-decoration: none;">Manage
                         Invoices →</a>
                 </div>

@@ -2,7 +2,14 @@
 // Manual UPI Payment Logic
 // ----------------------
 
-const API_BASE_URL = window.location.hostname === '127.0.0.1' ? 'http://127.0.0.1:5000' : 'http://localhost:5000';
+// NOTE: `API_BASE_URL` is already declared in `js/script.js` (loaded before this file).
+// Redeclaring it here breaks the whole script. We use a unique variable instead.
+const PAYMENT_API_BASE_URL =
+    typeof API_BASE_URL !== 'undefined'
+        ? API_BASE_URL
+        : window.location.hostname === '127.0.0.1'
+            ? 'http://127.0.0.1:5000'
+            : 'http://localhost:5000';
 const USER_ID_KEYS = ['sbme_user_id', 'sbme_current_user_id', 'userId'];
 const TOKEN_KEYS = ['authToken', 'token', 'jwt', 'accessToken'];
 
@@ -14,7 +21,7 @@ function getFirstLocalStorageValue(keys) {
     return null;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+async function initPaymentPage() {
     // Check auth
     const token = getFirstLocalStorageValue(TOKEN_KEYS);
     if (!token) {
@@ -27,19 +34,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const plan = urlParams.get('plan');
     const amount = urlParams.get('amount');
     const action = urlParams.get('action');
-    const userId = getFirstLocalStorageValue(USER_ID_KEYS);
 
-    // Validate params
-    if (!plan || !amount || !action || !userId) {
+    // Validate params (userId is not required for backend verification, only for display)
+    if (!plan || !amount || !action) {
         alert('Invalid payment session. Redirecting to profile.');
         window.location.href = 'profile.html';
         return;
     }
 
-    // Set UI Details
-    document.getElementById('displayPlan').textContent = plan;
-    document.getElementById('displayAmount').textContent = `₹${amount}`;
-    document.getElementById('displayUserId').textContent = userId;
+    // Set UI Details early
+    const displayPlanEl = document.getElementById('displayPlan');
+    const displayAmountEl = document.getElementById('displayAmount');
+    const displayUserIdEl = document.getElementById('displayUserId');
+
+    if (displayPlanEl) displayPlanEl.textContent = plan;
+    if (displayAmountEl) displayAmountEl.textContent = `₹${amount}`;
+
+    // Resolve userId for display (localStorage first, else /api/profile)
+    // Important: do not block timer/rendering on this network call.
+    let userId = getFirstLocalStorageValue(USER_ID_KEYS);
+    if (displayUserIdEl) {
+        displayUserIdEl.textContent = userId || '--';
+    }
+
+    if (!userId && displayUserIdEl) {
+            fetch(`${PAYMENT_API_BASE_URL}/api/profile`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            credentials: 'include'
+        })
+            .then((r) => r.json().catch(() => ({})))
+            .then((profileData) => {
+                if (profileData && profileData.id) {
+                    displayUserIdEl.textContent = String(profileData.id);
+                }
+            })
+            .catch(() => {
+                // ignore; payment page can still function
+            });
+    }
 
     // Copy UPI ID functionality
     const copyBtn = document.getElementById('copyBtn');
@@ -114,7 +150,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const txInput = document.getElementById('transactionId');
 
     function setStatus(type, msg) {
-        statusDiv.innerHTML = `<div class="alert alert-${type}">${msg}</div>`;
+        const safeMsg = msg == null ? '' : String(msg);
+        const cls =
+            type === 'success' ? 'text-success' : type === 'error' ? 'text-danger' : 'text-muted';
+        const icon =
+            type === 'success'
+                ? '<i class="fas fa-check-circle" aria-hidden="true"></i>'
+                : type === 'error'
+                    ? '<i class="fas fa-exclamation-circle" aria-hidden="true"></i>'
+                    : '<i class="fas fa-info-circle" aria-hidden="true"></i>';
+
+        statusDiv.innerHTML =
+            `<div role="status" aria-live="polite" class="payment-toast" data-type="${type}">${icon}<span class="${cls}">${safeMsg}</span></div>`;
     }
 
     paidBtn.addEventListener('click', () => {
@@ -154,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const tid = txInput.value.trim();
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/verify-payment`, {
+            const response = await fetch(`${PAYMENT_API_BASE_URL}/api/verify-payment`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -181,10 +228,10 @@ document.addEventListener('DOMContentLoaded', () => {
             paidBtn.style.display = 'none';
             txInput.disabled = true;
 
-            // Redirect after a brief moment to see success msg
+            // Redirect after a brief moment to see success toast
             setTimeout(() => {
                 window.location.href = 'profile.html';
-            }, 3000);
+            }, 5000);
 
         } catch (error) {
             modal.classList.remove('show');
@@ -198,4 +245,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-});
+}
+
+// Ensure init runs even if DOMContentLoaded has already fired.
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        initPaymentPage();
+    });
+} else {
+    initPaymentPage();
+}

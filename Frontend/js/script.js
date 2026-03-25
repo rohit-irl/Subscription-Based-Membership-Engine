@@ -7,26 +7,30 @@ const API_BASE_URL =
     window.location.hostname === '127.0.0.1'
         ? 'http://127.0.0.1:5000'
         : 'http://localhost:5000';
-const USER_ID_STORAGE_KEY = 'sbme_user_id';
-const AUTH_TOKEN_STORAGE_KEY = 'authToken';
+const USER_ID_STORAGE_KEYS = ['sbme_user_id', 'sbme_current_user_id', 'userId'];
+const AUTH_TOKEN_STORAGE_KEYS = ['authToken', 'token', 'jwt', 'accessToken'];
 
 function getAuthToken() {
-    return window.localStorage.getItem(AUTH_TOKEN_STORAGE_KEY) || null;
+    for (const key of AUTH_TOKEN_STORAGE_KEYS) {
+        const v = window.localStorage.getItem(key);
+        if (v) return v;
+    }
+    return null;
 }
 
 function setAuthToken(token) {
     if (!token) {
-        window.localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
+        for (const key of AUTH_TOKEN_STORAGE_KEYS) window.localStorage.removeItem(key);
         return;
     }
-    window.localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, String(token));
+    // Store into the canonical key we also use throughout the project
+    window.localStorage.setItem('authToken', String(token));
 }
 
 function clearAuthState() {
     setStoredUserId(null);
     setAuthToken(null);
-    window.localStorage.removeItem('sbme_current_user_id');
-    window.localStorage.removeItem('userId');
+    for (const key of USER_ID_STORAGE_KEYS) window.localStorage.removeItem(key);
 }
 
 function isLoggedIn() {
@@ -38,15 +42,20 @@ function getCurrentPageName() {
 }
 
 function getStoredUserId() {
-    return window.localStorage.getItem(USER_ID_STORAGE_KEY) || null;
+    for (const key of USER_ID_STORAGE_KEYS) {
+        const v = window.localStorage.getItem(key);
+        if (v) return v;
+    }
+    return null;
 }
 
 function setStoredUserId(userId) {
     if (!userId) {
-        window.localStorage.removeItem(USER_ID_STORAGE_KEY);
+        for (const key of USER_ID_STORAGE_KEYS) window.localStorage.removeItem(key);
         return;
     }
-    window.localStorage.setItem(USER_ID_STORAGE_KEY, String(userId));
+    // Store into the canonical key we also use throughout the project
+    window.localStorage.setItem('sbme_user_id', String(userId));
 }
 
 async function apiRequest(path, { method = 'GET', body } = {}) {
@@ -412,42 +421,152 @@ async function loadDashboardUser() {
         if (!downloadBtn.dataset.boundDownload) {
             downloadBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
-                const uid = getStoredUserId();
-                if (!uid) {
-                    setDashboardMessage('error', 'Please log in again.');
-                    window.location.href = 'login.html';
+                
+                // Use jsPDF to generate a document
+                if (typeof window.jspdf === 'undefined') {
+                    setDashboardMessage('error', 'PDF library not loaded.');
                     return;
                 }
-
+                
                 const btnText = downloadBtn.textContent;
                 downloadBtn.disabled = true;
                 downloadBtn.textContent = 'Preparing...';
-
+                
                 try {
-                    const result = await apiRequest('/download', {
-                        method: 'POST',
-                        body: { userId: uid }
-                    });
-
-                    setDashboardMessage('success', result.message || 'Download starting...');
-                    if (result && result.url) {
-                        window.open(result.url, '_blank', 'noopener');
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    
+                    doc.setFontSize(22);
+                    doc.setTextColor(16, 185, 129); // Primary color
+                    doc.text('CapySphere Resource Download', 20, 30);
+                    
+                    doc.setFontSize(18);
+                    doc.setTextColor(15, 23, 42); // Text main
+                    doc.text('Premium Resources Pack', 20, 45);
+                    
+                    doc.setFontSize(12);
+                    doc.setTextColor(100, 116, 139); // Text muted
+                    doc.text('Thank you for being a CapySphere member! Here are your assets.', 20, 55);
+                    
+                    doc.setFontSize(14);
+                    doc.setTextColor(15, 23, 42); 
+                    doc.text('Your Unlock Keys & URLs:', 20, 75);
+                    
+                    doc.setFontSize(11);
+                    doc.setTextColor(59, 130, 246);
+                    doc.text('• High-Res UI Kit (Figma): https://capysphere.com/dl/ui-kit-v2', 25, 85);
+                    doc.text('• Exclusive API Beta Access: https://api.capysphere.com/v2/beta', 25, 95);
+                    doc.text('• Analytics Dashboard Templates (.zip)', 25, 105);
+                    
+                    doc.setTextColor(15, 23, 42);
+                    doc.text('Your Access Token:', 20, 125);
+                    doc.setFont(undefined, 'bold');
+                    doc.text('CPY-8472-X9KL-P21M', 20, 132);
+                    doc.setFont(undefined, 'normal');
+                    
+                    doc.setTextColor(100, 116, 139);
+                    doc.text(`License holder: ${user?.name || 'User'} (${user?.email || 'N/A'})`, 20, 150);
+                    doc.text(`Plan type: ${user?.plan_name || user?.plan || 'Free'}`, 20, 158);
+                    
+                    const { remainingDownloads } = formatDownloads(user);
+                    if (remainingDownloads !== null) {
+                        doc.text(`Downloads remaining this month: ${Math.max(0, remainingDownloads - 1)}`, 20, 166);
                     }
-
-                    // Refresh data to update remaining downloads
-                    await loadDashboardUser();
+                    
+                    doc.setFontSize(10);
+                    doc.text(`Document generated on: ${new Date().toLocaleString()}`, 20, 280);
+                    
+                    doc.save('capysphere_resource.pdf');
+                    
+                    setDashboardMessage('success', 'Resource downloaded successfully!');
+                    
                 } catch (error) {
-                    console.error('Download failed:', error);
-                    setDashboardMessage('error', error.message || 'Download failed.');
-                    // Re-enable button unless we know limit is reached
-                    if (!(error && (error.status === 403 || error.status === 429))) {
-                        downloadBtn.disabled = false;
-                    }
+                    console.error('PDF generation failed:', error);
+                    setDashboardMessage('error', 'Failed to generate PDF.');
                 } finally {
+                    downloadBtn.disabled = false;
                     downloadBtn.textContent = btnText;
                 }
             });
             downloadBtn.dataset.boundDownload = 'true';
+        }
+        
+        // Inject and bind manage invoices button
+        const invoiceBtn = document.getElementById('manageInvoicesBtn');
+        if (invoiceBtn && !invoiceBtn.dataset.boundInvoice) {
+            invoiceBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                if (typeof window.jspdf === 'undefined') {
+                    setDashboardMessage('error', 'PDF library not loaded.');
+                    return;
+                }
+                
+                const originalText = invoiceBtn.innerHTML;
+                invoiceBtn.innerHTML = 'Generating...';
+                
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    
+                    doc.setFontSize(24);
+                    doc.setTextColor(59, 130, 246); // Secondary color
+                    doc.text('INVOICE', 105, 30, { align: 'center' });
+                    
+                    doc.setFontSize(14);
+                    doc.setTextColor(15, 23, 42); // Text main
+                    doc.text('CapySphere Inc.', 20, 50);
+                    doc.setFontSize(11);
+                    doc.setTextColor(100, 116, 139); // Text muted
+                    doc.text('123 Innovation Drive', 20, 58);
+                    doc.text('Tech District, CA 90210', 20, 64);
+                    
+                    doc.setFontSize(12);
+                    doc.setTextColor(15, 23, 42);
+                    doc.text('Billed To:', 140, 50);
+                    doc.setFontSize(11);
+                    doc.setTextColor(100, 116, 139);
+                    doc.text(`${user?.name || 'User'}`, 140, 58);
+                    doc.text(`${user?.email || 'N/A'}`, 140, 64);
+                    
+                    doc.setLineWidth(0.5);
+                    doc.line(20, 80, 190, 80);
+                    
+                    doc.setFontSize(12);
+                    doc.setTextColor(15, 23, 42);
+                    doc.text('Description', 20, 90);
+                    doc.text('Amount', 170, 90);
+                    
+                    doc.line(20, 95, 190, 95);
+                    
+                    const planName = user?.plan_name || user?.plan || 'Pro Plan';
+                    let amount = '$49.00';
+                    if (planName.toLowerCase() === 'basic') amount = '$19.00';
+                    if (planName.toLowerCase() === 'premium') amount = '$99.00';
+                    
+                    doc.setFontSize(11);
+                    doc.setTextColor(100, 116, 139);
+                    doc.text(`${planName} - Monthly Subscription`, 20, 105);
+                    doc.text(amount, 170, 105);
+                    
+                    doc.line(20, 115, 190, 115);
+                    
+                    doc.setFontSize(12);
+                    doc.setTextColor(15, 23, 42);
+                    doc.text('Total:', 140, 125);
+                    doc.text(amount, 170, 125);
+                    
+                    doc.save('capysphere_invoice.pdf');
+                    
+                    setDashboardMessage('success', 'Invoice downloaded successfully.');
+                } catch (error) {
+                    console.error('Invoice generation failed:', error);
+                    setDashboardMessage('error', 'Failed to generate invoice.');
+                } finally {
+                    invoiceBtn.innerHTML = originalText;
+                }
+            });
+            invoiceBtn.dataset.boundInvoice = 'true';
         }
     }
 }
@@ -488,6 +607,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
             durationLabels.forEach(label => {
                 label.textContent = billingToggle.checked ? '/yr' : '/mo';
+            });
+        });
+    }
+
+    // 1b. Pricing -> Payment redirect (only if logged in)
+    const pricingGrid = document.querySelector('.pricing-grid');
+    if (pricingGrid) {
+        const isAnyTokenPresent = isLoggedIn();
+        const cards = Array.from(pricingGrid.querySelectorAll('.pricing-card'));
+
+        const getDisplayedPrice = (card) => {
+            const amountEl = card.querySelector('.amount');
+            if (!amountEl) return null;
+            const raw = String(amountEl.textContent || '').replace(/[^0-9]/g, '');
+            const parsed = parseInt(raw, 10);
+            if (Number.isFinite(parsed) && parsed > 0) return parsed;
+
+            // Fallback: use dataset based on billing toggle state
+            if (billingToggle && billingToggle.checked && amountEl.dataset.yearly) {
+                return parseInt(amountEl.dataset.yearly, 10);
+            }
+            if (amountEl && amountEl.dataset.monthly) return parseInt(amountEl.dataset.monthly, 10);
+            return null;
+        };
+
+        cards.forEach((card) => {
+            const btn = card.querySelector('a.btn');
+            if (!btn) return;
+            if (btn.dataset.pricingRedirectBound === '1') return;
+
+            btn.dataset.pricingRedirectBound = '1';
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                const token = getAuthToken();
+                const userId = getStoredUserId();
+
+                if (!token || !userId) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                const planName = card.querySelector('h3')?.textContent?.trim();
+                const amount = getDisplayedPrice(card);
+
+                if (!planName || !amount) {
+                    // If something is missing, fallback to login to avoid a broken payment page.
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                window.location.href = `payment.html?action=upgrade&plan=${encodeURIComponent(
+                    planName
+                )}&amount=${encodeURIComponent(amount)}`;
             });
         });
     }
